@@ -3,7 +3,7 @@ import { IUser } from './users.interface'
 
 type UserModel = Model<IUser, object>
 
-const userSchema = new Schema<IUser, UserModel>(
+const userSchema = new Schema<IUser>(
   {
     id: {
       type: String,
