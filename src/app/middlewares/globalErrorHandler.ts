@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-unused-expressions */
-import { ErrorRequestHandler } from 'express';
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import config from '../../config';
 import ApiError from '../../errors/ApiErrors';
@@ -10,7 +10,13 @@ import handleZodError from '../../errors/handleZodError';
 import { IGenericErrorMessage } from '../../interfaces/error';
 import { errorlogger } from '../../shared/logger';
 
-const globalErrorHandler: ErrorRequestHandler = (error, req, res) => {
+const globalErrorHandler: ErrorRequestHandler = (
+  error,
+  req: Request,
+  res: Response,
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+  next: NextFunction
+) => {
   config.env === 'development'
     ? console.log('🚀 globalErrorHandler ~', error)
     : errorlogger.error('🚀 globalErrorHandler ~', error);
@@ -35,6 +41,7 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res) => {
     message = simplifiedError.message;
     errorMessages = simplifiedError.errorMessages;
   } else if (error instanceof ApiError) {
+    console.log(error);
     statusCode = error?.statusCode;
     message = error?.message;
     errorMessages = error?.message
