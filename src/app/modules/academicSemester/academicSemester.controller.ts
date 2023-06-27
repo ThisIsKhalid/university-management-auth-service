@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import httpStatus from 'http-status';
 import { paginationFields } from '../../../constants/paginationConstants';
 import catchAsync from '../../../shared/catchAsync';
@@ -9,7 +9,7 @@ import { IAcademicSemester } from './academicSemester.interface';
 import { AcademicSemesterService } from './academicSemester.service';
 
 const createSemester: RequestHandler = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response) => {
     const { ...academicSemesterData } = req.body;
     const result = await AcademicSemesterService.createSemester(
       academicSemesterData
@@ -21,74 +21,71 @@ const createSemester: RequestHandler = catchAsync(
       message: 'Academic semester created successfully !',
       data: result,
     });
-
-    next();
   }
 );
 
-const getAllSemester = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const filters = pick(req.query, academicSemesterFilterableFields);
-    const paginationOptions = pick(req.query, paginationFields);
+const getAllSemester = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, academicSemesterFilterableFields);
+  const paginationOptions = pick(req.query, paginationFields);
 
-    const result = await AcademicSemesterService.getAllSemester(
-      filters,
-      paginationOptions
-    );
+  const result = await AcademicSemesterService.getAllSemester(
+    filters,
+    paginationOptions
+  );
 
-    sendResponse<IAcademicSemester[]>(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Academic semester retrieved successfully !',
-      meta: result.meta,
-      data: result.data,
-    });
+  sendResponse<IAcademicSemester[]>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Academic semester retrieved successfully !',
+    meta: result.meta,
+    data: result.data,
+  });
+});
 
-    next();
-  }
-);
+const getSingleSemester = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
 
-const getSingleSemester = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
+  const result = await AcademicSemesterService.getSingleSemester(id);
 
-    const result = await AcademicSemesterService.getSingleSemester(id);
+  sendResponse<IAcademicSemester>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Single Academic semester retrieved successfully !',
+    data: result,
+  });
+});
 
-    sendResponse<IAcademicSemester>(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Single Academic semester retrieved successfully !',
-      data: result,
-    });
+const updateSemester = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const updatedData = req.body;
 
-    next();
-  }
-);
+  const result = await AcademicSemesterService.updateSemester(id, updatedData);
 
-const updateSemester = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    const updatedData = req.body;
+  sendResponse<IAcademicSemester>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Academic semester updated successfully !',
+    data: result,
+  });
+});
 
-    const result = await AcademicSemesterService.updateSemester(
-      id,
-      updatedData
-    );
+const deleteSemester = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
 
-    sendResponse<IAcademicSemester>(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Academic semester updated successfully !',
-      data: result,
-    });
+  const result = await AcademicSemesterService.deleteSemester(id);
 
-    next();
-  }
-);
+  sendResponse<IAcademicSemester>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Academic semester deleted successfully !',
+    data: result,
+  });
+});
 
 export const AcademicSemesterController = {
   createSemester,
   getAllSemester,
   getSingleSemester,
   updateSemester,
+  deleteSemester,
 };
