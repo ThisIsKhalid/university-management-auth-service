@@ -19,6 +19,9 @@ const userSchema = new Schema<IUser>(
   },
   {
     timestamps: true, // createdAt, updatedAt
+    toJSON: {
+      virtuals: true,
+    },
   }
 );
 
