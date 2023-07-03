@@ -1,0 +1,1 @@
+Mon Jul 03 2023 19:59:5 [PH-auth] error: Attempted illegal state transition from [TRANSACTION_ABORTED] to [TRANSACTION_COMMITTED]
