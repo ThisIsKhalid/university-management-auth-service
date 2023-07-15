@@ -1,9 +1,12 @@
 import httpStatus from 'http-status';
+import { Secret } from 'jsonwebtoken';
+import config from '../../../config';
 import ApiError from '../../../errors/ApiErrors';
+import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import { User } from '../user/user.model';
-import { ILoginUser } from './auth.interface';
+import { ILoginUser, ILoginUserResponse } from './auth.interface';
 
-const loginUser = async (payload: ILoginUser) => {
+const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   const { id, password } = payload;
 
   // check user exist
@@ -22,8 +25,27 @@ const loginUser = async (payload: ILoginUser) => {
   ) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password does not match');
   }
+  const { id: userId, role, needsPasswordChange } = isUserExist;
+  // create access token & refresh token
+  const accessToken = jwtHelpers.createToken(
+    { userId, role },
+    config.jwt.secret as Secret,
+    config.jwt.expires_in as string
+  );
 
-  // create access token
+  const refreshToken = jwtHelpers.createToken(
+    { userId, role },
+    config.jwt.refresh_secret as Secret,
+    config.jwt.refresh_expires_in as string
+  );
+
+  // console.log({ accessToken, refreshToken, needsPasswordChange });
+
+  return {
+    accessToken,
+    refreshToken,
+    needsPasswordChange,
+  };
 };
 
 export const AuthService = {
